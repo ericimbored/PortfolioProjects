@@ -1,6 +1,8 @@
 /* 
 SET SQL_SAFE_UPDATES = 1; -- Changes SafeMode to On, 1 = ON, 0 = OFF
+*/ 
 
+-- CONVERT EMPTY STRINGS TO NULL
 UPDATE NashvilleHousing
 SET
     PropertyAddress = CASE PropertyAddress WHEN '' THEN NULL ELSE PropertyAddress END,
@@ -15,16 +17,16 @@ SET
     Bedrooms = CASE Bedrooms WHEN '' THEN NULL ELSE Bedrooms END,
     FullBath = CASE FullBath WHEN '' THEN NULL ELSE FullBath END,
     HalfBath = CASE HalfBath WHEN '' THEN NULL ELSE HalfBath END
-*/ 
+
 
 /*
 
-Cleaning Data im SQL Queries
+CLEANING DATA IN SQL QUERIES
 
 */
 
 
--- Standardize Date Format
+-- STANDARDIZE DATE FORMAT
 
 SELECT SaleDateConverted -- , CONVERT('SaleDateConverted', DATE)
 FROM PortfolioDataCleaning.NashvilleHousing
@@ -41,6 +43,7 @@ SET SaleDateConverted = STR_TO_DATE(SaleDate, '%M %D %Y');
  ------------------------------------------------------------------------
  
 -- Populate Property Address Data
+
 SELECT PropertyAddress
 FROM PortfolioDataCleaning.NashvilleHousing
 -- WHERE PropertyAddress <=> ''
@@ -54,16 +57,23 @@ JOIN PortfolioDataCleaning.NashvilleHousing b
 	AND a.UniqueID <> b.UniqueID
 WHERE a.PropertyAddress IS NULL;
 
+
+------------------------------------------------------------------------
+
+
 -- Filling in the NULL values in PropertyAddress
 UPDATE NashvilleHousing a, NashvilleHousing b 
 	SET b.PropertyAddress = a.PropertyAddress
 WHERE b.PropertyAddress IS NULL
 	AND b.ParcelID = a.ParcelID
 	AND a.PropertyAddress is not null;
-         
+
+
+------------------------------------------------------------------------
+
+
 /*
 This script doesn't work on MYSQL
----------------------------------
 UPDATE NashvilleHousing a, NashvilleHousing b
 JOIN NashvilleHousing as b 
 		ON a.ParcelID = b.ParcelID
@@ -80,9 +90,11 @@ SQL SERVER SYNTAX
 -- 	AND a.UniqueID <> b.UniqueID
 */
 
+
 ------------------------------------------------------------------------
 
--- Breaking out Adderss into Individual Columns (Address, City, State)
+
+-- Breaking the Address into Individual Columns (Address, City, State)
 
 SELECT PropertyAddress
 FROM PortfolioDataCleaning.NashvilleHousing
@@ -107,7 +119,12 @@ UPDATE NashvilleHousing
 SET PropertySplitCity = SUBSTRING(PropertyAddress, INSTR(PropertyAddress, ',') +1 );
 
 
+------------------------------------------------------------------------
+
+
 -- SELECT OwnerAddress FROM PortfolioDataCleaning.NashvilleHousing
+-- Breaking the OwnerAddress into Individual Columns (Address, City, State)
+-- Updating the table to add the individual columns
 
 SELECT 
 SUBSTRING_INDEX(OwnerAddress,',', 1),
@@ -136,7 +153,9 @@ SET OwnerSplitState = SUBSTRING_INDEX(OwnerAddress,',', -1);
 
 -- SELECT * FROM PortfolioDataCleaning.NashvilleHousing -- Viewing entire table
 
+
 ------------------------------------------------------------------------
+
 
 -- Change Y and N to Yes and No in "Sold as Vacant" field
 
@@ -164,6 +183,7 @@ SET SoldAsVacant = CASE
         
 ------------------------------------------------------------------------
 
+
 -- Remove Duplicates
 
 /* 
@@ -190,6 +210,7 @@ WHERE Row_Num > 1
 */ 
 
 -- MYSQL SCRIPT TO REMOVE DUPLICATES USING CTE
+
 WITH RowNumCTE AS(
 SELECT *,
 	ROW_NUMBER() OVER (
@@ -207,8 +228,8 @@ from NashvilleHousing nh INNER JOIN RowNumCTE r ON nh.UniqueID = r.UniqueID
 where Row_Num > 1;
 
 
-
 ------------------------------------------------------------------------
+
 
 -- Delete Ununsed Columns
 
@@ -219,5 +240,3 @@ DROP COLUMN PropertyAddress,
 DROP COLUMN OwnerAddress, 
 DROP COLUMN TaxDistrict,
 DROP COLUMN SaleDate;
-
-
