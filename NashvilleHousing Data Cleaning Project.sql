@@ -9,7 +9,7 @@ SET
     OwnerName = CASE OwnerName WHEN '' THEN NULL ELSE OwnerName END,
     OwnerAddress = CASE OwnerAddress WHEN '' THEN NULL ELSE OwnerAddress END,
     Acreage = CASE Acreage WHEN '' THEN NULL ELSE Acreage END,
-	TaxDistrict = CASE TaxDistrict WHEN '' THEN NULL ELSE TaxDistrict END,
+    TaxDistrict = CASE TaxDistrict WHEN '' THEN NULL ELSE TaxDistrict END,
     LandValue = CASE LandValue WHEN '' THEN NULL ELSE LandValue END,
     BuildingValue = CASE BuildingValue WHEN '' THEN NULL ELSE BuildingValue END,
     TotalValue = CASE TotalValue WHEN '' THEN NULL ELSE TotalValue END,
